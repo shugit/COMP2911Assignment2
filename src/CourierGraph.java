@@ -219,10 +219,16 @@ public class CourierGraph{
 	 * @return 
 	 */
 	private double distanceOf(Point p,Job j){
-		return Math.abs(p.getX() - j.midPoint().getX())+
-				Math.abs(p.getY() - j.midPoint().getY());
+		return Math.sqrt(Math.pow(p.getX() - j.midPoint().getX(),2)+
+				Math.pow(p.getY() - j.midPoint().getY(),2));
 	}
 
+	/**
+	 * Manhatten distance
+	 * @param p1
+	 * @param p2
+	 * @return
+	 */
 	private double distanceOf(Point p1, Point p2){
 		return Math.abs(p1.getX() - p2.getX())+
 				Math.abs(p1.getY() - p2.getY());
