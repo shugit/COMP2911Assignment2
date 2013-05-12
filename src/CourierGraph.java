@@ -198,14 +198,26 @@ public class CourierGraph{
 		return Collections.min(rests, new P2JComparator(p));
 	}
 
+	/**
+	 * 
+	 * @param j1
+	 * @param j2
+	 * @return a straight distance
+	 */
 	private double distanceOf(Job j1,Job j2){
 		//System.out.println(j1.midPoint().getX()+" "+j2.midPoint().getX());
 		
 		
-		return Math.sqrt(Math.pow((j1.midPoint().getX() - j2.midPoint().getX()),2) +
+		return Math.sqrt(Math.pow(j1.midPoint().getX() - j2.midPoint().getX(),2) +
 				Math.pow(j1.midPoint().getY() - j2.midPoint().getY(),2 ));
 	}
-
+	
+	/**
+	 * Manhatten distance
+	 * @param p
+	 * @param j
+	 * @return 
+	 */
 	private double distanceOf(Point p,Job j){
 		return Math.abs(p.getX() - j.midPoint().getX())+
 				Math.abs(p.getY() - j.midPoint().getY());
