@@ -16,5 +16,7 @@ public class Point {
 	public double getY() {
 		return y;
 	}
-	
+	public void print() {
+		System.out.print((int)this.x+" "+(int)this.y);
+	}
 }

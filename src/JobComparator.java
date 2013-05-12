@@ -16,10 +16,15 @@ public class JobComparator implements Comparator<Job>
 		return o1.compareTo(o2);
 	}
 	
-	
+	/**
+	 * straight light distance of jobs' midpoint
+	 * @param j1
+	 * @param j2
+	 * @return
+	 */
 	private Double distanceOf(Job j1, Job j2){
-		return (Math.pow(j1.midPoint().getX() - j2.midPoint().getX(),2)+
-				Math.pow(j1.midPoint().getY() - j2.midPoint().getY(),2));
+		return Math.sqrt((Math.pow(j1.midPoint().getX() - j2.midPoint().getX(),2)+
+				Math.pow(j1.midPoint().getY() - j2.midPoint().getY(),2)));
 	}
 	
 	

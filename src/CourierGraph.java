@@ -4,7 +4,7 @@ import java.util.PriorityQueue;
 
 
 public class CourierGraph{
-	public static boolean debug = true;
+	public static boolean debug = false;
 	private ArrayList<Job> jobs = new ArrayList<Job>();
 
 	/**
@@ -37,7 +37,7 @@ public class CourierGraph{
 			ArrayList<Job> newRests = (ArrayList<Job>) jobs.clone();
 			newRests.remove(j);
 			//System.out.println("DONE" + this.hx(j, newRests));
-			toVisit.add(new ASJob(j,this.hx(j, newRests) + this.gx(fromJobs), fromJobs) );
+			toVisit.add(new ASJob(j,this.hx(j, newRests) + this.gx(j,fromJobs), fromJobs) );
 
 		}
 
@@ -57,16 +57,17 @@ public class CourierGraph{
 			if(debug){
 				System.out.print("This Job is ");
 				asj.getJob().print();
-				System.out.println("Reach node from");
-				this.printList(asj.getFrom());
+				//System.out.println("Reach node from");
+				//this.printList(asj.getFrom());
 			}
 			ArrayList<Job> rests = (ArrayList<Job>) this.getRest(asj.getFrom()).clone();
 			rests.remove(asj.getJob());
-			//System.out.println("testflag");
 			if (rests.isEmpty()) {
-				System.out.println("DONE");
-				this.printList(asj.getFrom());
-				asj.getJob().print();
+				System.out.println((toVisit.size()+asj.getFrom().size())+" nodes explores");
+				System.out.println("cost = "+this.gx(asj.getJob(), asj.getFrom()));
+				asj.getFrom().add(asj.getJob());
+				//this.printList(asj.getFrom());
+				this.printPath(asj.getFrom());
 				return;
 			} else {
 
@@ -84,14 +85,11 @@ public class CourierGraph{
 					ArrayList<Job> newFromJobs = (ArrayList<Job>) asj.getFrom().clone();
 					newFromJobs.add(asj.getJob());
 
-					double gx = this.gx(newFromJobs);
+					double gx = this.gx(eachJob,newFromJobs);
 					//System.out.println("testflag");
 					toVisit.add(new ASJob(eachJob,gx+hx,newFromJobs));
 				}
 			}
-			// step 6, a new visited list, add asj. visited should be complementary of rest.
-			//visited.add(asj);
-			//rests.remove(asj.getJob());
 		}
 
 
@@ -106,59 +104,71 @@ public class CourierGraph{
 	 * @return
 	 */
 	private double hx(Job aCurrent, ArrayList<Job> rests){
-		//this.removeInitial(rests);
+
+
 		// j->nearest
 		// nearest -> next nearest
 		Job current = aCurrent;
 
 		Job next = this.nearestJob(current.getEnd(), rests);
-		double hx = distanceOf(current.getEnd(),next);
+		double hx = this.distanceOf(current.getEnd(),next);
+		
 		while(!rests.get(rests.size()-1).equals(next)){
 			rests.remove(current);
 			current = next;
 			next = this.nearestJob(current, rests);
+			//hx += current.length()*0.5;
+			//hx += this.distanceOf(current.getEnd(), next);
 			hx += this.distanceOf(current, next);
-
 		}
 
-		/*if(debug){
+		if(debug){
 			System.out.println("hx = "+hx);
-		}*/
+		}
 
 		return hx;
+
+		//return 0;
+
 	}
+
 
 	/**
 	 * get g(x), which is the length from starting point to end point consists of job length
 	 * @param fromJobs
+	 * @param j
 	 * @return
 	 */
-	private int gx(ArrayList<Job> fromJobs){
-
-
-		if(fromJobs.size() > 0){
-			int gx = (int)this.distanceOf(new Point(0,0), fromJobs.get(0).getStart());
+	private int gx(Job j,ArrayList<Job> fromJobs){
+		int gx = 0;
+		//System.out.print("@gx the list is ");
+		//j.print();
+		//printList(fromJobs);
+		Point lastPoint;
+		if (fromJobs.size() == 0){ // Job j is the first
+			lastPoint = new Point(0,0);
+		} else {
+			gx += distanceOf(new Point(0,0), fromJobs.get(0).getStart());
 			gx += fromJobs.get(0).length();
+			lastPoint = fromJobs.get(0).getEnd();
 
-			//System.out.println("size "+fromJobs.size());
-
-			if (fromJobs.size() > 1) {
+			if(fromJobs.size() > 1){
 				for(int i = 1; i < fromJobs.size() ; i++){
 					Job pre = fromJobs.get(i-1);
 					Job next = fromJobs.get(i);
 					gx += distanceOf(pre.getEnd(),next.getStart());
 					gx += next.length();
+					lastPoint = next.getEnd();
 				}
 			}
-			return gx;
-		} else 
-			return 0;
+
+		}
+		gx += this.distanceOf(lastPoint, j.getStart()); 
+		gx += j.length();
+		return gx;
+
 	}
 
-
-	private int size() {
-		return jobs.size();
-	}
 
 	/**
 	 * calculate a nearest job based on current job, not end point.
@@ -167,7 +177,7 @@ public class CourierGraph{
 	 * @return
 	 */
 	private Job nearestJob(Job j1,ArrayList<Job> rests){
-		this.removeInitial(rests);
+		//this.removeInitial(rests);
 
 		ArrayList<Job> jobList = new ArrayList<Job>();
 		for(Job j2 : rests){
@@ -206,12 +216,12 @@ public class CourierGraph{
 	 */
 	private double distanceOf(Job j1,Job j2){
 		//System.out.println(j1.midPoint().getX()+" "+j2.midPoint().getX());
-		
-		
+
+
 		return Math.sqrt(Math.pow(j1.midPoint().getX() - j2.midPoint().getX(),2) +
 				Math.pow(j1.midPoint().getY() - j2.midPoint().getY(),2 ));
 	}
-	
+
 	/**
 	 * straight distance
 	 * @param p
@@ -229,9 +239,9 @@ public class CourierGraph{
 	 * @param p2
 	 * @return
 	 */
-	private double distanceOf(Point p1, Point p2){
-		return Math.abs(p1.getX() - p2.getX())+
-				Math.abs(p1.getY() - p2.getY());
+	private int distanceOf(Point p1, Point p2){
+		return (int) (Math.abs(p1.getX() - p2.getX())+
+				Math.abs(p1.getY() - p2.getY()));
 	}
 
 	private ArrayList<Job> getRest(ArrayList<Job> visited){
@@ -245,6 +255,27 @@ public class CourierGraph{
 		return newList;
 	}
 
+	
+	public void printPath(ArrayList<Job> list){
+		for(int i = 1; i < list.size(); i++){
+			Job cur = list.get(i-1);
+			Job next = list.get(i);
+			if(list.indexOf(cur) == 0){
+				System.out.print("Move from 0 0 to ");
+				cur.getStart().print();
+				System.out.println();
+				System.out.print("Carry from");
+				cur.print();
+			} 
+			System.out.print("Move from ");
+			cur.getEnd().print();
+			System.out.print(" to ");
+			next.getStart().print();
+			System.out.println();
+			System.out.print("Carry from");
+			next.print();
+		}
+	}
 
 	// for DEBUG 
 	public void printList(ArrayList<Job> list){
@@ -259,17 +290,6 @@ public class CourierGraph{
 		}
 	}
 
-	private void removeInitial(ArrayList<Job> list){
-		for(int i = 0; i< list.size();i++){
-			Job each = list.get(i);
-			if(each.equals(new Job(0,0,0,0))){
-				list.remove(each);
-				if(debug){
-					System.out.println("@removeInitial : initial detected");
-				}
-			}
-		}
-	}
 
 }
 

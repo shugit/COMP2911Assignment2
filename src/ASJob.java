@@ -1,9 +1,10 @@
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 
 public class ASJob {
 
-	private static final boolean debug = true;
+	private static final boolean debug = false;
 	private Job j;
 	private double cx;
 	private ArrayList<Job> fromJobs;
@@ -16,7 +17,9 @@ public class ASJob {
 		if(debug){
 			System.out.print("ASJob: ");
 			j.print();
-			System.out.println("cx="+cx);
+			DecimalFormat df = new DecimalFormat("#.00");
+			System.out.print("cx="+df.format(this.cx));
+			System.out.println();
 		}
 	}
 	
@@ -31,7 +34,8 @@ public class ASJob {
 	}
 	
 	public void print(){
-		System.out.println("This cx is "+cx);
+		DecimalFormat df = new DecimalFormat("#.00");
+		System.out.println("This cx is "+df.format(this.cx));
 	}
 	
 }
