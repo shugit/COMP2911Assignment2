@@ -13,10 +13,14 @@ public class P2JComparator implements Comparator<Job> {
 		return d1.compareTo(d2);
 	}
 	
-	
+	/**
+	 * straight line distance
+	 * @param j
+	 * @return
+	 */
 	private double distanceOf(Job j){
-		return Math.abs(this.p.getX() - j.midPoint().getX())+
-				Math.abs(this.p.getY() - j.midPoint().getY());
+		return Math.pow(this.p.getX() - j.midPoint().getX(),2)+
+				Math.pow(this.p.getY() - j.midPoint().getY(),2);
 	}
 	
 	private Point p;

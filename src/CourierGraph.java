@@ -213,7 +213,7 @@ public class CourierGraph{
 	}
 	
 	/**
-	 * Manhatten distance
+	 * straight distance
 	 * @param p
 	 * @param j
 	 * @return 

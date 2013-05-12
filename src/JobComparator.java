@@ -18,8 +18,8 @@ public class JobComparator implements Comparator<Job>
 	
 	
 	private Double distanceOf(Job j1, Job j2){
-		return (Math.abs(j1.midPoint().getX() - j2.midPoint().getX())+
-				Math.abs(j1.midPoint().getY() - j2.midPoint().getY()));
+		return (Math.pow(j1.midPoint().getX() - j2.midPoint().getX(),2)+
+				Math.pow(j1.midPoint().getY() - j2.midPoint().getY(),2));
 	}
 	
 	
