@@ -30,4 +30,8 @@ public class ASJob {
 		return fromJobs;
 	}
 	
+	public void print(){
+		System.out.println("This cx is "+cx);
+	}
+	
 }

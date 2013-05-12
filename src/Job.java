@@ -31,6 +31,6 @@ public class Job {
 	}
 
 	public void print(){
-		System.out.println("From "+(int)start.getX()+" "+(int)start.getY()+" to "+(int)end.getX()+" "+(int)end.getY());
+		System.out.println(" "+(int)start.getX()+" "+(int)start.getY()+" to "+(int)end.getX()+" "+(int)end.getY());
 	}
 }

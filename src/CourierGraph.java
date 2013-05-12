@@ -30,37 +30,51 @@ public class CourierGraph{
 
 		PriorityQueue<ASJob> toVisit = new PriorityQueue<ASJob>(1,new PQComparator());
 		ArrayList<Job> fromJobs = new ArrayList<Job>();
+
+
 		// step 1, add starting jobs to toVisit
-		
 		for(Job j: jobs){
 			ArrayList<Job> newRests = (ArrayList<Job>) jobs.clone();
 			newRests.remove(j);
 			//System.out.println("DONE" + this.hx(j, newRests));
 			toVisit.add(new ASJob(j,this.hx(j, newRests) + this.gx(fromJobs), fromJobs) );
-			
+
 		}
-		
+
 		// step 2, while toVisit is not empty
 		while (!toVisit.isEmpty()) {
-			
+			if(debug){
+				System.out.println("******ASJob List****");
+				for(ASJob test: toVisit){
+					test.getJob().print();
+					test.print();
+				}
+				System.out.println("***end of ASJob List****");
+			}
 			// step 3, get asj from toVisit
 			ASJob asj = toVisit.remove();
 			// setp 4, if it's not goal(which means all job not cleared)
-			this.printList(asj.getFrom());
+			if(debug){
+				System.out.print("This Job is ");
+				asj.getJob().print();
+				System.out.println("Reach node from");
+				this.printList(asj.getFrom());
+			}
 			ArrayList<Job> rests = (ArrayList<Job>) this.getRest(asj.getFrom()).clone();
 			rests.remove(asj.getJob());
-			asj.getJob().print();
-			System.out.println("testflag");
+			//System.out.println("testflag");
 			if (rests.isEmpty()) {
 				System.out.println("DONE");
 				this.printList(asj.getFrom());
+				asj.getJob().print();
 				return;
 			} else {
+
 				if(debug){
 					System.out.println("@route : rests:");
 					this.printList(rests);
 				}
-				
+
 				// setp 5, calculate asj's adjancent points' h(x) and g(x) and push them into PriorityQueue
 				for (Job eachJob : rests) {
 
@@ -69,9 +83,9 @@ public class CourierGraph{
 					// add asj to fromJobs (for calculating path)
 					ArrayList<Job> newFromJobs = (ArrayList<Job>) asj.getFrom().clone();
 					newFromJobs.add(asj.getJob());
-					
+
 					double gx = this.gx(newFromJobs);
-					System.out.println("testflag");
+					//System.out.println("testflag");
 					toVisit.add(new ASJob(eachJob,gx+hx,newFromJobs));
 				}
 			}
@@ -96,23 +110,21 @@ public class CourierGraph{
 		// j->nearest
 		// nearest -> next nearest
 		Job current = aCurrent;
-		
+
 		Job next = this.nearestJob(current.getEnd(), rests);
 		double hx = distanceOf(current.getEnd(),next);
 		while(!rests.get(rests.size()-1).equals(next)){
 			rests.remove(current);
 			current = next;
 			next = this.nearestJob(current, rests);
-			//System.out.println("testflag");
 			hx += this.distanceOf(current, next);
-			//System.out.println("testflag");
-			
+
 		}
-		
+
 		/*if(debug){
 			System.out.println("hx = "+hx);
 		}*/
-		
+
 		return hx;
 	}
 
@@ -122,16 +134,22 @@ public class CourierGraph{
 	 * @return
 	 */
 	private int gx(ArrayList<Job> fromJobs){
+
+
 		if(fromJobs.size() > 0){
 			int gx = (int)this.distanceOf(new Point(0,0), fromJobs.get(0).getStart());
 			gx += fromJobs.get(0).length();
-			for(int i = 1; fromJobs.get(i) != null; i++){
-				Job pre = fromJobs.get(i-1);
-				Job next = fromJobs.get(i);
-				gx += distanceOf(pre.getEnd(),next.getStart());
-				gx += next.length();
-			}
 
+			//System.out.println("size "+fromJobs.size());
+
+			if (fromJobs.size() > 1) {
+				for(int i = 1; i < fromJobs.size() ; i++){
+					Job pre = fromJobs.get(i-1);
+					Job next = fromJobs.get(i);
+					gx += distanceOf(pre.getEnd(),next.getStart());
+					gx += next.length();
+				}
+			}
 			return gx;
 		} else 
 			return 0;
@@ -150,7 +168,7 @@ public class CourierGraph{
 	 */
 	private Job nearestJob(Job j1,ArrayList<Job> rests){
 		this.removeInitial(rests);
-		
+
 		ArrayList<Job> jobList = new ArrayList<Job>();
 		for(Job j2 : rests){
 			if(!j1.equals(j2)){
@@ -158,7 +176,7 @@ public class CourierGraph{
 			}
 		}
 		Job j = Collections.min(jobList, new JobComparator(j1));
-		
+
 		//for debug
 		/*if(debug){
 			System.out.println("@nearestJob");
@@ -182,8 +200,10 @@ public class CourierGraph{
 
 	private double distanceOf(Job j1,Job j2){
 		//System.out.println(j1.midPoint().getX()+" "+j2.midPoint().getX());
-		return Math.abs(j1.midPoint().getX() - j2.midPoint().getX())+
-				Math.abs(j1.midPoint().getY() - j2.midPoint().getY());
+		
+		
+		return Math.sqrt(Math.pow((j1.midPoint().getX() - j2.midPoint().getX()),2) +
+				Math.pow(j1.midPoint().getY() - j2.midPoint().getY(),2 ));
 	}
 
 	private double distanceOf(Point p,Job j){
@@ -198,7 +218,7 @@ public class CourierGraph{
 
 	private ArrayList<Job> getRest(ArrayList<Job> visited){
 		ArrayList<Job> newList = new ArrayList<Job>();
-		
+
 		for( Job j : jobs){
 			if(!visited.contains(j)){
 				newList.add(j);
@@ -220,7 +240,7 @@ public class CourierGraph{
 			each.print();
 		}
 	}
-	
+
 	private void removeInitial(ArrayList<Job> list){
 		for(int i = 0; i< list.size();i++){
 			Job each = list.get(i);
