@@ -5,6 +5,7 @@ import java.util.PriorityQueue;
 
 public class CourierGraph{
 	public static boolean debug = false;
+
 	private ArrayList<Job> jobs = new ArrayList<Job>();
 
 	/**
@@ -57,8 +58,8 @@ public class CourierGraph{
 			if(debug){
 				System.out.print("This Job is ");
 				asj.getJob().print();
-				//System.out.println("Reach node from");
-				//this.printList(asj.getFrom());
+				System.out.println("Reach node from");
+				this.printList(asj.getFrom());
 			}
 			ArrayList<Job> rests = (ArrayList<Job>) this.getRest(asj.getFrom()).clone();
 			rests.remove(asj.getJob());
@@ -112,7 +113,7 @@ public class CourierGraph{
 
 		Job next = this.nearestJob(current.getEnd(), rests);
 		double hx = this.distanceOf(current.getEnd(),next);
-		
+
 		while(!rests.get(rests.size()-1).equals(next)){
 			rests.remove(current);
 			current = next;
@@ -178,22 +179,27 @@ public class CourierGraph{
 	 */
 	private Job nearestJob(Job j1,ArrayList<Job> rests){
 		//this.removeInitial(rests);
-
+		//this.printList(rests);
+		//j1.print();
 		ArrayList<Job> jobList = new ArrayList<Job>();
 		for(Job j2 : rests){
 			if(!j1.equals(j2)){
 				jobList.add(j2);
 			}
 		}
-		Job j = Collections.min(jobList, new JobComparator(j1));
-
+		Job j = j1;
+		if( jobList.size() == 0){
+			return j;
+		}else {
+			j = Collections.min(jobList, new JobComparator(j1));
+		}
 		//for debug
-		/*if(debug){
+		if(debug){
 			System.out.println("@nearestJob");
 			this.printList(jobList);
 			System.out.print("gonna return:");
 			j.print();
-		}*/
+		}
 		return j;
 	}
 
@@ -255,22 +261,34 @@ public class CourierGraph{
 		return newList;
 	}
 
-	
+
 	public void printPath(ArrayList<Job> list){
 		for(int i = 1; i < list.size(); i++){
 			Job cur = list.get(i-1);
 			Job next = list.get(i);
 			if(list.indexOf(cur) == 0){
-				System.out.print("Move from 0 0 to ");
-				cur.getStart().print();
-				System.out.println();
+				if(cur.getStart().equalsTo(new Point(0,0))){
+
+				}else{
+					System.out.print("Move from 0 0 to ");
+					cur.getStart().print();
+					System.out.println();
+					
+				}
 				System.out.print("Carry from");
 				cur.print();
 			} 
-			System.out.print("Move from ");
-			cur.getEnd().print();
-			System.out.print(" to ");
-			next.getStart().print();
+
+			if (cur.getEnd().equalsTo(next.getStart())){
+
+			} else {
+				System.out.print("Move from ");
+				cur.getEnd().print();
+				System.out.print(" to ");
+				next.getStart().print();
+			}
+
+
 			System.out.println();
 			System.out.print("Carry from");
 			next.print();

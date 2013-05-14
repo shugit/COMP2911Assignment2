@@ -8,8 +8,6 @@ public class Point {
 		this.y = e;
 	}
 	
-	
-	
 	public double getX() {
 		return x;
 	}
@@ -18,5 +16,13 @@ public class Point {
 	}
 	public void print() {
 		System.out.print((int)this.x+" "+(int)this.y);
+	}
+	
+	public boolean equalsTo(Point p){
+		if(this.getX() == p.getX() && this.getY() == p.getY()){
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
